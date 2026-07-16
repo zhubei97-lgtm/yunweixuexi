@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counter-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: counter-app
+  template:
+    metadata:
+      labels:
+        app: counter-app
+    spec:
+      containers:
+      - name: counter-app
+        image: docker.io/taojie1/counter-app:v5
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        envFrom:
+          - configMapRef:
+              name: counter-config
+        env: 
+        - name: title
+          value: "{{ .Values.title}}"
+        - name: DB_PASSWORD
+          valueFrom:
+          secretKeyRef:
+            name: db-secret
+            key: password
