@@ -24,7 +24,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/counter-app:latest
 
-
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -39,7 +38,7 @@ jobs:
       - name: Deploy to K3s
         run: |
           mkdir -p $HOME/.kube
-          echo "$KUBECONFIG" > $HOME/.kube/config
-          kubectl rollout restart deployment/counter-app-deployment
-        env:
-          KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
+          cat <<EOF > $HOME/.kube/config
+          ${{ secrets.KUBE_CONFIG }}
+          EOF
+          kubectl --insecure-skip-tls-verify=true rollout restart deployment/counter-app-deployment
